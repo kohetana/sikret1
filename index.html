@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DataLine — SQL: Язык, который понимают все машины</title>
+<style>
+/* ============ DATALINE / 1986-1992 ============ */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:#000000;
+  color:#d8e6d8;
+  font-family:"Courier New",Courier,IBM Plex Mono,monospace;
+  font-size:15px;
+  line-height:1.55;
+}
+a{color:#35f070;}
+img{display:block;max-width:100%;border:1px solid #2b6b3f;}
+.wrap{max-width:1160px;margin:0 auto;padding:0 16px;}
+
+/* ---- строка состояния ---- */
+.statusline{
+  border-bottom:2px solid #1c3f94;
+  background:#000000;
+  color:#7cff9b;
+  font-size:13px;
+  letter-spacing:1px;
+  padding:8px 16px;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.statusline b{color:#ffb000;}
+
+/* ---- меню ---- */
+.menu{border-bottom:1px solid #2b6b3f;background:#04121f;}
+.menu ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;}
+.menu li+li{border-left:1px solid #1c3f94;}
+.menu a{
+  display:block;padding:8px 14px;
+  color:#f4f4f4;text-decoration:none;
+  font-size:13px;letter-spacing:1px;
+}
+.menu a:hover{background:#35f070;color:#000000;}
+
+/* ---- секции ---- */
+.sec{padding:24px 0 28px;border-top:1px solid #1c3f94;}
+.sechead{
+  display:flex;align-items:baseline;gap:12px;
+  border:1px solid #35f070;background:#001207;
+  padding:8px 12px;margin-bottom:18px;
+}
+.sechead .num{color:#ffb000;font-weight:bold;letter-spacing:1px;}
+.sechead h2{
+  margin:0;font-size:20px;letter-spacing:2px;
+  text-transform:uppercase;color:#35f070;
+}
+.sechead .rule{flex:1;border-bottom:1px dotted #1f9c4a;transform:translateY(-5px);}
+.sechead .tag{color:#8fb6ff;font-size:12px;letter-spacing:1px;white-space:nowrap;}
+
+p{margin:0 0 12px;}
+.lead{color:#f4f4f4;}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.cols3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+
+/* ---- панели ---- */
+.panel{border:1px solid #2b6b3f;background:#001207;padding:14px;}
+.panel.blue{border-color:#1c3f94;background:#04121f;}
+.panel h3{
+  margin:0 0 8px;font-size:14px;letter-spacing:2px;
+  text-transform:uppercase;color:#8fb6ff;
+}
+.panel.amber{border-color:#ffb000;background:#0a0800;}
+.panel.amber h3{color:#ffb000;}
+
+/* ---- центральная шутка ---- */
+.claim{
+  border:1px solid #ffb000;background:#000000;
+  color:#ffd48a;padding:12px 14px;margin:0 0 14px;
+  font-size:16px;
+}
+/* ---- терминал ---- */
+pre.term{
+  border:1px solid #35f070;background:#000000;color:#7cff9b;
+  padding:12px;margin:0;font-size:14px;
+  white-space:pre-wrap;overflow-x:auto;
+}
+pre.term .amberline{color:#ffb000;}
+.caption{
+  border:1px solid #1c3f94;background:#04121f;color:#8fb6ff;
+  font-size:12px;padding:5px 8px;letter-spacing:1px;
+}
+
+/* ---- таблицы ---- */
+table{border-collapse:collapse;width:100%;font-size:14px;background:#000000;}
+th,td{border:1px solid #2b6b3f;padding:7px 10px;vertical-align:top;text-align:left;}
+th{
+  background:#1c3f94;color:#ffffff;
+  text-transform:uppercase;letter-spacing:1px;font-size:13px;
+}
+tbody tr:nth-child(even){background:#04121f;}
+td.year{color:#ffb000;white-space:nowrap;font-weight:bold;}
+
+/* ---- кнопка ---- */
+.btn{
+  display:inline-block;
+  border:2px solid #35f070;background:#000000;color:#35f070;
+  padding:11px 20px;font-size:15px;letter-spacing:2px;
+  text-transform:uppercase;text-decoration:none;
+  font-family:inherit;cursor:pointer;
+}
+.btn:hover{background:#35f070;color:#000000;}
+.btn.amberbtn{border-color:#ffb000;color:#ffb000;}
+.btn.amberbtn:hover{background:#ffb000;color:#000000;}
+.enroll-log{
+  display:none;border:1px solid #ffb000;background:#0a0800;
+  color:#ffd48a;padding:10px 12px;margin-top:12px;font-size:14px;
+}
+
+/* ---- hero ---- */
+.hero{position:relative;padding:30px 0 34px;overflow:hidden;}
+.hero .inner{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:24px;align-items:start;}
+.hero-text{
+  background:#000000;border:1px solid #2b6b3f;padding:18px 20px;
+}
+.kicker{color:#ffb000;font-size:13px;letter-spacing:2px;margin-bottom:10px;}
+h1{
+  margin:0 0 14px;color:#ffffff;
+  font-size:40px;line-height:1.15;letter-spacing:1px;
+  text-transform:uppercase;
+}
+h1 span{display:block;color:#35f070;}
+.subtitle{border-top:1px solid #1c3f94;padding-top:10px;color:#8fb6ff;font-size:14px;letter-spacing:1px;}
+.hero-figure{position:relative;z-index:1;align-self:center;text-align:center;}
+.hero-figure img{border-color:#35f070;margin:0 auto;}
+.boot{margin-top:12px;}
+
+/* ---- история / фото ---- */
+figure{margin:0;}
+figcaption{margin-top:6px;font-size:12px;color:#8fb6ff;letter-spacing:1px;}
+
+/* ---- ученик ---- */
+.quote{
+  border:1px solid #ffb000;background:#0a0800;color:#ffd48a;
+  padding:16px;font-size:17px;
+}
+.quote .who{display:block;margin-top:10px;color:#ffb000;font-size:13px;letter-spacing:1px;}
+
+/* ---- footer ---- */
+footer{
+  border-top:2px solid #1c3f94;background:#04121f;
+  color:#8fb6ff;font-size:12px;padding:14px 0 24px;letter-spacing:1px;
+}
+footer p{margin:0 0 6px;}
+
+/* ---- адаптация ---- */
+@media (max-width:900px){
+  .cols,.cols3,.hero .inner{grid-template-columns:1fr;}
+  h1{font-size:28px;}
+  .hero-figure{order:2;}
+  table{font-size:13px;}
+  th,td{padding:6px 7px;}
+}
+</style>
+</head>
+<body id="top">
+
+<header class="statusline">
+  <span><b>■</b> DATALINE TRAINING CENTER</span>
+  <span>STD: ANSI/ISO 9075</span>
+  <span>TERM: IBM 3270</span>
+  <span>EPOCH: 1986&ndash;1992</span>
+</header>
+
+<nav class="menu">
+  <div class="wrap">
+    <ul>
+      <li><a href="#hero">01 ГЛАВНАЯ</a></li>
+      <li><a href="#what">02 ЧТО ЕСТЬ SQL</a></li>
+      <li><a href="#history">03 ИСТОРИЯ</a></li>
+      <li><a href="#program">04 ПРОГРАММА</a></li>
+      <li><a href="#student">05 УЧЕНИК</a></li>
+      <li><a href="#req">06 СРЕДА</a></li>
+      <li><a href="#cta">07 ЗАЯВКА</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+
+<!-- ============ 01 ГЛАВНЫЙ ЭКРАН ============ -->
+<section class="hero" id="hero">
+  <div class="wrap">
+    <div class="inner">
+      <div class="hero-text">
+        <div class="kicker">УЧЕБНЫЙ ЦЕНТР &laquo;DATALINE&raquo; · КУРС КОРПОРАТИВНОЙ АВТОМАТИЗАЦИИ</div>
+        <h1>SQL: <span>Язык, который понимают все машины</span></h1>
+        <div class="claim">&laquo;SQL &mdash; это английский. Просто английский, который понимает машина, а не человек.&raquo;</div>
+        <p class="lead">Декларативный язык запросов к реляционным базам данных. Вы описываете результат &mdash; СУБД берёт план выполнения на себя. Один вопрос вместо сотни строк процедурного кода.</p>
+        <p><a class="btn" href="#cta">Записаться на курс</a></p>
+        <div class="subtitle">КУРС ДЛЯ СИСТЕМНЫХ АНАЛИТИКОВ И АДМИНИСТРАТОРОВ БД. СТАНДАРТ ANSI/ISO. ЭПОХА МЕЙНФРЕЙМОВ.</div>
+      </div>
+
+      <div class="hero-figure">
+        <img src="assets/images/terminal-green.png" alt="Терминал с зелёным текстом" width="360" height="360">
+        <div class="caption">ТЕРМИНАЛ · ЗЕЛЁНЫЙ ФОСФОР · ЧЁРНЫЙ ФОН</div>
+        <pre class="term boot">DATALINE/3270  READY
+----------------------------------
+SELECT name, salary
+  FROM employees
+ WHERE salary &gt; 50000;
+----------------------------------
+<span class="amberline">24 ROWS SELECTED</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 ЧТО ЕСТЬ SQL ============ -->
+<section class="sec" id="what">
+  <div class="wrap">
+    <div class="sechead">
+      <span class="num">02</span>
+      <h2>Что такое SQL</h2>
+      <span class="rule"></span>
+      <span class="tag">ДЕКЛАРАТИВНОСТЬ · РЕЛЯЦИОННАЯ МОДЕЛЬ</span>
+    </div>
+
+    <div class="cols">
+      <div>
+        <div class="claim">SQL не спрашивает &laquo;как&raquo;, он спрашивает &laquo;что&raquo;.</div>
+        <p class="lead">Пользователь описывает результат, а СУБД сама выбирает план выполнения. Это и есть декларативность: машине не нужен алгоритм, ей достаточно описания того, что вы хотите получить.</p>
+        <p>До SQL доступ к данным требовал навигации по структурам &mdash; сетевые и иерархические модели, как в IMS. Реляционная модель предложила другой путь: данные &mdash; это таблицы, а запросы &mdash; операции над множествами.</p>
+
+        <div class="panel amber">
+          <h3>Почему это английский</h3>
+          <p>В 1974&ndash;1977 годах Дональд Чемберлин и Рэй Бойс из IBM San Jose Research Laboratory создали язык <b>SEQUEL</b> &mdash; Structured English Query Language, структурированный английский язык запросов &mdash; для экспериментальной СУБД System&nbsp;R. В 1977 году язык переименовали в SQL из-за конфликта торговой марки.</p>
+          <p style="margin-bottom:0;">Так что это не фигуральная шутка: это действительно английский. Просто английский, который понимает машина, а не человек.</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel blue">
+          <h3>Пример запроса</h3>
+          <pre class="term">SELECT * FROM employees
+ WHERE salary &gt; 50000;</pre>
+          <p style="margin-top:12px;">Пояснение: &laquo;выбери всё из таблицы сотрудники, где зарплата больше 50000&raquo;. Запрос читается как фраза &mdash; СУБД понимает её без перевода и без подсказок о том, в каком порядке искать данные.</p>
+        </div>
+
+        <div class="panel">
+          <h3>Что получает аналитик</h3>
+          <p style="margin-bottom:0;">Один запрос может заменить сотни строк процедурного кода. Декларативность снизила порог входа: работать с данными смогли аналитики и бизнес-пользователи, а не только инженеры, пишущие обходы таблиц.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 ИСТОРИЯ И СТАНДАРТ ============ -->
+<section class="sec" id="history">
+  <div class="wrap">
+    <div class="sechead">
+      <span class="num">03</span>
+      <h2>История и стандарт</h2>
+      <span class="rule"></span>
+      <span class="tag">ОТ КОДДА ДО SQL-92</span>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th style="width:140px;">Год</th><th>Событие</th><th style="width:32%;">Значение</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="year">1970</td>
+          <td>Эдгар Ф. Кодд (IBM) публикует статью &laquo;A Relational Model of Data for Large Shared Data Banks&raquo;</td>
+          <td>Начало реляционной модели</td>
+        </tr>
+        <tr>
+          <td class="year">1974&ndash;1977</td>
+          <td>Дональд Чемберлин и Рэй Бойс создают SEQUEL в IBM San Jose Research Laboratory для СУБД System R</td>
+          <td>Рождение языка</td>
+        </tr>
+        <tr>
+          <td class="year">1977</td>
+          <td>SEQUEL переименован в SQL из-за конфликта торговой марки</td>
+          <td>Имя, которое знает весь мир</td>
+        </tr>
+        <tr>
+          <td class="year">1979</td>
+          <td>Relational Software Inc. (позже Oracle) выпускает первую коммерческую реализацию SQL</td>
+          <td>Язык выходит в бизнес</td>
+        </tr>
+        <tr>
+          <td class="year">1986 / 1987</td>
+          <td>ANSI принимает SQL как стандарт; следом ISO</td>
+          <td>Единый стандарт ANSI/ISO</td>
+        </tr>
+        <tr>
+          <td class="year">1992</td>
+          <td>Выходит SQL-92, важнейший стандарт</td>
+          <td>Синтаксис, который изучают до сих пор</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="cols" style="margin-top:16px;">
+      <div class="panel blue">
+        <h3>Ключевые имена</h3>
+        <p style="margin-bottom:0;">Эдгар Кодд &middot; Дональд Чемберлин &middot; Рэй Бойс. Их работа превратила исследовательский язык в обязательный язык корпоративных СУБД: Oracle, IBM DB2, Sybase, Informix.</p>
+      </div>
+      <div class="panel">
+        <h3>Стандарт как гарантия</h3>
+        <p style="margin-bottom:0;">Английский, изначально заложенный в название SEQUEL, получил официальную рамку. К 1992 году один и тот же язык понимали все основные СУБД &mdash; знания переносились между системами без переучивания.</p>
+      </div>
+    </div>
+
+    <figure style="margin-top:16px;">
+      <img src="assets/images/mainframe-room.jpg" alt="Машинный зал мейнфрейма" width="740" height="600" style="max-height:340px;object-fit:cover;">
+      <figcaption>МАШИННЫЙ ЗАЛ: МАГНИТНЫЕ ЛЕНТЫ, ДИСКОВЫЕ МАССИВЫ, ПАКЕТНАЯ ОБРАБОТКА &mdash; СРЕДА, В КОТОРОЙ SQL СТАНДАРТИЗОВАЛСЯ.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ 04 ПРОГРАММА КУРСА ============ -->
+<section class="sec" id="program">
+  <div class="wrap">
+    <div class="sechead">
+      <span class="num">04</span>
+      <h2>Программа курса</h2>
+      <span class="rule"></span>
+      <span class="tag">5 МОДУЛЕЙ · ФОРМАТ MANUAL IBM</span>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th style="width:70px;">№</th><th style="width:30%;">Модуль</th><th>Содержание</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="year">1</td>
+          <td>Основы SELECT</td>
+          <td>Тот самый английский: проекция, условие, сортировка. Научиться говорить с машиной &laquo;что&raquo;, а не &laquo;как&raquo;.</td>
+        </tr>
+        <tr>
+          <td class="year">2</td>
+          <td>JOIN и подзапросы</td>
+          <td>Соединение таблиц реляционной модели, вложенные запросы, работа с несколькими наборами данных сразу.</td>
+        </tr>
+        <tr>
+          <td class="year">3</td>
+          <td>Транзакции и целостность</td>
+          <td>Изменения банковских и учётных данных, поддержание целостности базы при совместной работе пользователей.</td>
+        </tr>
+        <tr>
+          <td class="year">4</td>
+          <td>Оптимизация запросов</td>
+          <td>Как СУБД выбирает план выполнения и как помочь ей выбрать правильный.</td>
+        </tr>
+        <tr>
+          <td class="year">5</td>
+          <td>Работа с DB2 и Oracle</td>
+          <td>Практика на внедрённых корпоративных СУБД: один и тот же стандарт на разных машинах.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="cols" style="margin-top:16px;">
+      <div class="panel amber">
+        <h3>Шутка внутри программы</h3>
+        <p style="margin-bottom:0;">Первый модуль начинается не с синтаксиса, а с языка: &laquo;выбери&raquo;, &laquo;где&raquo;, &laquo;соедини&raquo;. Если вы читаете эти слова &mdash; вы уже владеете материалом первого занятия.</p>
+      </div>
+      <div class="panel blue">
+        <h3>Формат занятий</h3>
+        <p style="margin-bottom:0;">Таблица модулей, набор запросов на терминале, разбор плана выполнения, опорный manual. Занятия идут в учебном классе учебного центра &laquo;DataLine&raquo;.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 ИСТОРИЯ УЧЕНИКА ============ -->
+<section class="sec" id="student">
+  <div class="wrap">
+    <div class="sechead">
+      <span class="num">05</span>
+      <h2>История ученика</h2>
+      <span class="rule"></span>
+      <span class="tag">БАНКИ · ОТЧЁТЫ · ТЕРМИНАЛ</span>
+    </div>
+
+    <div class="cols">
+      <div>
+        <div class="quote">
+          &laquo;Джон, системный аналитик из Чикаго, прошёл курс и теперь пишет запросы для банка. Его отчёты строятся за минуты, а не за дни.&raquo;
+          <span class="who">ВЫПУСКНИК КУРСА · СИСТЕМНЫЙ АНАЛИТИК</span>
+        </div>
+        <p style="margin-top:14px;">Банки, страхование и государственные системы &mdash; именно они в эпоху стандартизации массово переходили на реляционные СУБД. Запрос вместо процедурного обхода таблиц: аналитик описывает результат, отчёт готов.</p>
+        <div class="claim">Джон ставит вопрос по-английски &mdash; терминал отвечает. Переводчика не нужно: его роль выполняет стандарт ANSI/ISO.</div>
+      </div>
+
+      <figure>
+        <img src="assets/images/mainframe-room.jpg" alt="Рабочее место эпохи мейнфреймов" width="740" height="600" style="max-height:300px;object-fit:cover;">
+        <figcaption>РАБОЧЕЕ МЕСТО КОРПОРАТИВНОГО СПЕЦИАЛИСТА ЭПОХИ: МЕЙНФРЕЙМ, ЛЕНТЫ, ПЕЧАТЬ ОТЧЁТОВ.</figcaption>
+        <div class="panel blue" style="margin-top:10px;">
+          <h3>Справка</h3>
+          <p style="margin-bottom:0;">SQL применяется системными аналитиками, администраторами БД, разработчиками и бизнес-пользователями. В эпоху стандарта язык стал обязательным для корпоративных систем.</p>
+        </div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 ТРЕБОВАНИЯ К КОМПЬЮТЕРУ ============ -->
+<section class="sec" id="req">
+  <div class="wrap">
+    <div class="sechead">
+      <span class="num">06</span>
+      <h2>Требования к компьютеру</h2>
+      <span class="rule"></span>
+      <span class="tag">ТЕХНОЛОГИЧЕСКАЯ СРЕДА КУРСА</span>
+    </div>
+
+    <div class="cols">
+      <div>
+        <table>
+          <thead>
+            <tr><th style="width:34%;">Позиция</th><th>Требование</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Терминал</td><td>IBM 3270 или совместимый</td></tr>
+            <tr><td>Доступ</td><td>Рабочая СУБД с поддержкой стандарта: DB2, Oracle</td></tr>
+            <tr><td>Материалы</td><td>Manual SQL-92</td></tr>
+            <tr><td>Язык</td><td>Отдельного английского не требуется: SQL &mdash; это английский. Просто английский, который понимает машина.</td></tr>
+            <tr><td>Аппаратура</td><td>Требований к аппаратуре нет: работа идёт на терминалах мейнфрейма</td></tr>
+          </tbody>
+        </table>
+        <div class="panel amber" style="margin-top:14px;">
+          <h3>Шутка в строке требований</h3>
+          <p style="margin-bottom:0;">Единственный пункт, который пугает слушателей, уже закрыт: машина не ждёт от вас литературного английского. Она ждёт запроса.</p>
+        </div>
+      </div>
+
+      <figure>
+        <img src="assets/images/terminal-retro.png" alt="Терминал эпохи мейнфреймов" width="480" height="480" style="max-height:360px;margin:0 auto;">
+        <figcaption style="text-align:center;">ТЕРМИНАЛ КАК ЕДИНСТВЕННЫЙ ИНСТРУМЕНТ: ЭКРАН, КЛАВИАТУРА, ЗЕЛЁНЫЙ ТЕКСТ.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 ПРИЗЫВ К ДЕЙСТВИЮ ============ -->
+<section class="sec" id="cta">
+  <div class="wrap">
+    <div class="sechead">
+      <span class="num">07</span>
+      <h2>Призыв к действию</h2>
+      <span class="rule"></span>
+      <span class="tag">ЗАЯВКА · СТАНДАРТ · БУДУЩЕЕ</span>
+    </div>
+
+    <div class="panel amber" style="border-width:2px;">
+      <div class="kicker">УЧЕБНЫЙ ЦЕНТР &laquo;DATALINE&raquo;</div>
+      <div class="claim" style="border-color:#35f070;color:#7cff9b;">Запишитесь сегодня. Ваши данные уже ждут. Стандарт ANSI/ISO.</div>
+      <p class="lead">Ваши данные ждут ответа на английском. Машина уже понимает его &mdash; осталось научиться говорить с ней на том же языке. Курс даёт этот язык, стандарт и практику на реальных корпоративных СУБД.</p>
+      <p><button class="btn amberbtn" id="enroll" type="button">Записаться на курс</button></p>
+      <div class="enroll-log" id="enroll-log">DATALINE: ЗАЯВКА ПРИНЯТА. ОЖИДАЙТЕ ЗВОНКА ОПЕРАТОРА ОБУЧЕНИЯ.</div>
+    </div>
+
+    <div class="cols3" style="margin-top:16px;">
+      <div class="panel">
+        <h3>Учебный центр</h3>
+        <p style="margin-bottom:0;">&laquo;DataLine&raquo;<br>Корпоративный учебный центр<br>Отдел корпоративного обучения</p>
+      </div>
+      <div class="panel">
+        <h3>Приём заявок</h3>
+        <p style="margin-bottom:0;">Лично в учебном классе<br>или через оператора ЭВМ<br>тел. 01-86-92</p>
+      </div>
+      <div class="panel">
+        <h3>Обещание</h3>
+        <p style="margin-bottom:0;">Ваши данные будут говорить на одном языке &mdash; и вы будете понимать их без перевода.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Учебный центр &laquo;DataLine&raquo; и курсы вымышлены. Объект исследования: SQL (декларативный язык запросов к реляционным БД), эпоха 1986&ndash;1992.</p>
+    <p>Материалы проекта: research &middot; era &middot; concept &middot; sources &middot; blocks 01&ndash;07. Автор: Кучина Мария Александровна, ПИ-261.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var btn = document.getElementById('enroll');
+  var log = document.getElementById('enroll-log');
+  if(btn && log){
+    btn.addEventListener('click', function(){
+      log.style.display = 'block';
+      log.setAttribute('role','status');
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

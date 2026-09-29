@@ -1,0 +1,38 @@
+# Источники
+
+## История и факты
+1. Wikipedia: SQL — https://en.wikipedia.org/wiki/SQL
+   Что проверено: история, стандарты, ключевые даты.
+2. Wikipedia: Edgar F. Codd — https://en.wikipedia.org/wiki/Edgar_F._Codd
+   Что проверено: реляционная модель, статья 1970 года.
+3. IBM History: System R — https://www.ibm.com/ibm/history/ibm100/us/en/icons/reldb/
+   Что проверено: создание System R и SEQUEL/SQL.
+4. Oracle: History — https://www.oracle.com/corporate/history/
+   Что проверено: первая коммерческая СУБД с SQL.
+5. ISO/IEC 9075 (SQL standard) — https://www.iso.org/standard/
+   Что проверено: стандарты SQL, SQL-92.
+6. Computer History Museum — https://computerhistory.org/
+   Что проверено: мейнфреймы, терминалы, среда 1980-х.
+
+## Визуальные источники
+1. IBM 3270 terminal — поиск изображений
+   Что взято как ориентир: зелёный текст, рамки, моноширинный шрифт.
+2. IBM DB2 manuals — обложки manuals 1980-х
+   Что взято как ориентир: типографика, композиция, синие переплёты.
+3. Datamation magazine 1980s — реклама СУБД
+   Что взято как ориентир: язык рекламы, заголовки, подписи.
+4. Computerworld 1980s — реклама IBM, Oracle
+   Что взято как ориентир: корпоративный голос, обещания.
+5. Oracle V2 advertisement — реклама 1979
+   Что взято как ориентир: композиция, обещания.
+6. SQL-92 standard cover — обложка стандарта
+   Что взято как ориентир: типографика, официальный стиль.
+7. Mainframe room photos — рабочие места 1980-х
+   Что взято как ориентир: материальная среда.
+8. Green screen terminal screenshots — экраны с SQL-запросами
+   Что взято как ориентир: фон hero, примеры кода.
+
+## Локальные материалы
+- assets/images/terminal-green.png — источник: скриншот терминала; назначение: фон hero.
+- assets/images/ibm-manual.jpg — источник: обложка manual; назначение: блок «Программа».
+- assets/images/sql92-cover.png — источник: обложка стандарта; назначение: блок «Стандарт».
